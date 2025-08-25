@@ -21,12 +21,26 @@ const onSubmit = () => {
     password: form.password
   }).then(res => {
     console.log(res)
+    localStorage.setItem('token', res.data.access)
   })
 }
 const form = reactive({
   name: '',
   password: ''
 })
+const tableData = ref([])
+//定义查询函数，要求通过token查询项目数据
+const onQuery = () => {
+  const token = localStorage.getItem('token')
+  axios.get('/projects/', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }).then(res => {
+    console.log(res)
+    tableData.value = res.data
+  })
+}
 </script>
 
 <template>
@@ -53,7 +67,41 @@ const form = reactive({
       <el-button>Cancel</el-button>
     </el-form-item>
     </el-form>
+    <!-- 添加一个查询按钮 在table中展示projectinfo 数据  "projid": 1,
+        "customername": "ABInbev",
+        "servertype": "Dell 塔式",
+        "databasetype": "Mysql",
+        "ProjStatus": "未启动",
+        "projno": "X1.000123",
+        "plannedwh": 200,
+        "location": "beijing",
+        "projdescription": "测试项目",
+        "startingtime": "2025-07-04T14:47:00+08:00",
+        "opcstatus": "采购中",
+        "serverstatus": "已收货",
+        "osstatus": "采购中",
+        "databasestatus": "采购中",
+        "opcidgroup": "1，2",
+        "kodate": "2025-07-04",
+        "projstatusid": 1,
+        "customerid": 1,
+        "serverid": 2,
+        "databaseid": 3-->
 
+     <el-button @click="onQuery">查询</el-button>
+     
+     <el-table :data="tableData" style="width: 30%"> 
+      <el-table-column
+        prop="projid"
+        label="项目ID"
+        width="200">
+      </el-table-column>
+      <el-table-column
+        prop="customername"
+        label="客户名称"
+        width="350">
+      </el-table-column>
+    </el-table>
 
   </el-main>
 
